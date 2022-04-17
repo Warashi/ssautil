@@ -1,6 +1,11 @@
 package ssautil
 
-import "golang.org/x/tools/go/ssa"
+import (
+	"go/types"
+	"unicode"
+
+	"golang.org/x/tools/go/ssa"
+)
 
 type Referrerer interface {
 	Referrers() *[]ssa.Instruction
@@ -33,4 +38,16 @@ func Operands(o Operander) []ssa.Value {
 		}
 	}
 	return nonnil
+}
+
+func isUpper(r rune) bool {
+	return unicode.IsUpper(r) && unicode.IsLetter(r)
+}
+
+func IsExported(f *ssa.Function) bool {
+	return isUpper([]rune(f.Name())[0])
+}
+
+func IsContext(v *types.Var) bool {
+	return v.Type().String() == "context.Context"
 }
