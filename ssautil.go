@@ -1,6 +1,7 @@
 package ssautil
 
 import (
+	"go/ast"
 	"go/types"
 	"unicode"
 
@@ -45,7 +46,7 @@ func isUpper(r rune) bool {
 }
 
 func IsExported(f *ssa.Function) bool {
-	return isUpper([]rune(f.Name())[0])
+	return ast.IsExported(f.Name())
 }
 
 func IsContext(v *types.Var) bool {
