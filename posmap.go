@@ -9,8 +9,11 @@ import (
 	"golang.org/x/tools/go/analysis/passes/buildssa"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
-	"golang.org/x/tools/go/ssa"
 )
+
+type Poser interface {
+	Pos() token.Pos
+}
 
 func Prepare(ctx context.Context, pass *analysis.Pass) context.Context {
 	ctx = context.WithValue(ctx, passKey, pass)
@@ -30,20 +33,21 @@ func buildPosMap(ctx context.Context) map[token.Pos][]ast.Node {
 	return posMap
 }
 
-func CallExpr(ctx context.Context, call *ssa.Call) (*ast.CallExpr, bool) {
+func Node[U ast.Node, T Poser](ctx context.Context, p T) (node U, ok bool) {
 	posMap := PosMap(ctx)
-	for i := call.Pos(); i > 0; i-- {
+	for i := p.Pos(); i > 0; i-- {
 		stack := posMap[i]
 		if len(stack) == 0 {
 			break
 		}
 		for j := range stack {
 			node := stack[len(stack)-1-j]
-			ident, ok := node.(*ast.CallExpr)
+			ident, ok := node.(U)
 			if ok {
 				return ident, true
 			}
 		}
 	}
-	return nil, false
+	var zero U
+	return zero, false
 }
