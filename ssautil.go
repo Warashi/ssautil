@@ -1,9 +1,7 @@
 package ssautil
 
 import (
-	"go/ast"
 	"go/types"
-	"unicode"
 
 	"golang.org/x/tools/go/ssa"
 )
@@ -39,14 +37,6 @@ func Operands(o Operander) []ssa.Value {
 		}
 	}
 	return nonnil
-}
-
-func isUpper(r rune) bool {
-	return unicode.IsUpper(r) && unicode.IsLetter(r)
-}
-
-func IsExported(f *ssa.Function) bool {
-	return ast.IsExported(f.Name())
 }
 
 func IsContext(v *types.Var) bool {
